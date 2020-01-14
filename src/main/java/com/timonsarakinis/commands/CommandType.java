@@ -1,4 +1,4 @@
-package com.timonsarakinis.parser;
+package com.timonsarakinis.commands;
 
 public enum CommandType {
     ARITHMETIC,
@@ -10,4 +10,5 @@ public enum CommandType {
     FUNCTION,
     RETURN,
     CALL;
+
 }

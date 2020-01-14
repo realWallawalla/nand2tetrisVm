@@ -1,5 +1,9 @@
 package com.timonsarakinis.parser;
 
+import com.google.common.base.Splitter;
+import com.timonsarakinis.commands.Command;
+import com.timonsarakinis.commands.CommandFactory;
+import com.timonsarakinis.commands.CommandType;
 import com.timonsarakinis.io.FileReaderWriter;
 
 import java.util.List;
@@ -12,7 +16,7 @@ import java.util.ListIterator;
  */
 public class HackVmParser {
     private ListIterator<String> iterator;
-    private Object currentCommand;
+    private Command currentCommand;
 
     public HackVmParser(String inputFilePath) {
         this.iterator = FileReaderWriter.readFile(inputFilePath).listIterator();
@@ -23,18 +27,32 @@ public class HackVmParser {
     }
 
     public void advance() {
-        this.currentCommand = iterator.next();
+        String next = iterator.next();
+        List<String> resultList = Splitter.on(" ")
+                .trimResults()
+                .omitEmptyStrings()
+                .splitToList(next);
+
+        this.currentCommand = CommandFactory.createCommand(resultList);
     }
 
     public CommandType commandType() {
-        return CommandType.ARITHMETIC;
+        return currentCommand.getCommandType();
+    }
+
+    public Command getCurrentCommand() {
+        return currentCommand;
+    }
+
+    public String operator() {
+        return currentCommand.getOperator();
     }
 
     public String arg1() {
-        return "";
+        return currentCommand.getArg1();
     }
 
     public int arg2() {
-        return 0;
+        return currentCommand.getArg2();
     }
 }
