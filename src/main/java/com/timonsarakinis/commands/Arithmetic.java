@@ -17,17 +17,17 @@ public class Arithmetic implements Command {
     }
 
     @Override
-    public String getOperator() {
+    public String getOperation() {
         return operation;
     }
 
     @Override
-    public String getArg1() {
+    public String getSegment() {
         return arg1;
     }
 
     @Override
-    public int getArg2() {
+    public int getIndex() {
         return arg2;
     }
 }

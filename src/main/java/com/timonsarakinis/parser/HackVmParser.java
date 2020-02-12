@@ -6,6 +6,7 @@ import com.timonsarakinis.commands.CommandFactory;
 import com.timonsarakinis.commands.CommandType;
 import com.timonsarakinis.io.FileReaderWriter;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -18,7 +19,7 @@ public class HackVmParser {
     private ListIterator<String> iterator;
     private Command currentCommand;
 
-    public HackVmParser(String inputFilePath) {
+    public HackVmParser(Path inputFilePath) {
         this.iterator = FileReaderWriter.readFile(inputFilePath).listIterator();
     }
 
@@ -45,14 +46,14 @@ public class HackVmParser {
     }
 
     public String operator() {
-        return currentCommand.getOperator();
+        return currentCommand.getOperation();
     }
 
     public String arg1() {
-        return currentCommand.getArg1();
+        return currentCommand.getSegment();
     }
 
     public int arg2() {
-        return currentCommand.getArg2();
+        return currentCommand.getIndex();
     }
 }

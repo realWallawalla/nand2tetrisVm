@@ -3,9 +3,9 @@ package com.timonsarakinis.commands;
 public interface Command {
     CommandType getCommandType();
 
-    String getOperator();
+    String getOperation();
 
-    String getArg1();
+    String getSegment();
 
-    int getArg2();
+    int getIndex();
 }
