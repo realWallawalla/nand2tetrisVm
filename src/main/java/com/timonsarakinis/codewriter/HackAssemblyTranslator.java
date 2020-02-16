@@ -26,14 +26,14 @@ public class HackAssemblyTranslator {
     public static final String STATIC = "static";
     public static final String TEMP = "temp";
     public static final String POINTER = "pointer";
-    public static final String GLOBAL_STACK_POINTER_BASE_ADDRESS = "@256";
-    //public static final int STATIC_SEGMENT_BASE_ADDRESS = 16; // 16 to 255
-    public static final String LOCAL_BASE_ADDRESS = "@300";
-    public static final String ARG_BASE_ADDRESS = "@400";
-    public static final String THIS_BASE_ADDRESS = "@3000";
-    public static final String THAT_BASE_ADDRESS = "@3010";
     public static final String TEMP_BASE_ADDRESS = "@5"; //5-12
     public static final int POINT_TO_THIS = 0;
+    /*public static final String GLOBAL_STACK_POINTER_BASE_ADDRESS = "@256";
+    public static final int STATIC_SEGMENT_BASE_ADDRESS = 16; // 16 to 255
+    public static final String LOCAL_BASE_ADDRESS = "@300";
+    public static final String ARG_BASE_ADDRESS = "@400";
+    public static final String THIS_BASE_ADDRESS = "@3030";
+    public static final String THAT_BASE_ADDRESS = "@3040";*/
 
     private static int uniquePrefix;
     private final String fileName;
@@ -45,11 +45,11 @@ public class HackAssemblyTranslator {
         this.fileName = fileName;
         this.outPutPath = FileReaderWriter.getOutputPath(fileName + ".asm");
         segmentPointerMapping = initMapping();
-        initSegmentBaseAddress(GLOBAL_STACK_POINTER_BASE_ADDRESS, segmentPointerMapping.get("constant"));
+/*        initSegmentBaseAddress(GLOBAL_STACK_POINTER_BASE_ADDRESS, segmentPointerMapping.get("constant"));
         initSegmentBaseAddress(LOCAL_BASE_ADDRESS, segmentPointerMapping.get("local"));
         initSegmentBaseAddress(ARG_BASE_ADDRESS, segmentPointerMapping.get("argument"));
         initSegmentBaseAddress(THIS_BASE_ADDRESS, segmentPointerMapping.get("this"));
-        initSegmentBaseAddress(THAT_BASE_ADDRESS, segmentPointerMapping.get("that"));
+        initSegmentBaseAddress(THAT_BASE_ADDRESS, segmentPointerMapping.get("that"));*/
     }
 
     private void initSegmentBaseAddress(String baseAddress, String pointer) {
