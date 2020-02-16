@@ -8,12 +8,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.StringJoiner;
 
-import static com.timonsarakinis.codewriter.ArithmaticType.*;
+import static com.timonsarakinis.codewriter.JumpExpressionType.*;
 
 /**
  *
  * Translator module: Translates hackVmCide code to hackAssemblyCode.
  * Initalizes the different stackPointers in each segment.
+ *
+ * Hack assembly has 3 memories. D = dataMemory. A = addressMemory. M = memoryRam, address of A -> M = RAM[A]
+ * Read more documentation on hackAssymbly code on nand2tetris.org.
  *
  **/
 
@@ -75,7 +78,7 @@ public class HackAssemblyTranslator {
 
     public void writeArithmetic(String operator) {
         //write to outputfile the assembly code that implements the given arithmetic command
-        ArithmaticType arithmaticType = valueOf(operator.toUpperCase());
+        ArithmaticType arithmaticType = ArithmaticType.valueOf(operator.toUpperCase());
         uniquePrefix = uniquePrefix + 1;
         switch (arithmaticType) {
             case ADD:
@@ -150,43 +153,31 @@ public class HackAssemblyTranslator {
     private void buildEq() {
         output.add("//EQ");
         popTwoFromStack(SP);
+        logicOperationTemplate("IS_EQ" + uniquePrefix, EQUALS.getLogicExpression());
+    }
+
+    private void logicOperationTemplate(String symbol, String jumpExpression) {
         output.add("D=M-D"); // check if zero
         output.add("M=-1"); //true
-        output.add("@IS_EQ" + uniquePrefix);
-        output.add("D;JEQ");
+        output.add("@" + symbol);
+        output.add(jumpExpression);
         output.add(SP);
         output.add("A=M");
         output.add("M=0");
-        output.add("(IS_EQ" + uniquePrefix + ")");
+        output.add("(" + symbol + ")");
         output.add(SP);
     }
 
     private void buildLessThen() {
         output.add("//LT");
         popTwoFromStack(SP);
-        output.add("D=M-D"); // check if M is less then D. True is difference is negative
-        output.add("M=-1");
-        output.add("@IS_LT" + uniquePrefix);
-        output.add("D;JLT");
-        output.add(SP);
-        output.add("A=M");
-        output.add("M=0");
-        output.add("(IS_LT" + uniquePrefix  + ")");
-        output.add(SP);
+        logicOperationTemplate("IS_LT" + uniquePrefix, LESS_THEN.getLogicExpression());
     }
 
     private void buildGreaterThen() {
         output.add("//GT");
         popTwoFromStack(SP);
-        output.add("D=M-D"); // check if M is greater then D. True if difference is positive
-        output.add("M=-1");
-        output.add("@IS_GT" + uniquePrefix);
-        output.add("D;JGT");
-        output.add(SP);
-        output.add("A=M");
-        output.add("M=0");
-        output.add("(IS_GT" + uniquePrefix  + ")");
-        output.add(SP);
+        logicOperationTemplate("IS_GT" + uniquePrefix, GREATER_THEN.getLogicExpression());
     }
 
     private void buildAnd() {
@@ -217,61 +208,49 @@ public class HackAssemblyTranslator {
         if (vmSegment.equals(SP)) {
             output.add("@" + index);
             output.add("D=A");
-            output.add(SP);
-            output.add("A=M");
-            output.add("M=D");
-            output.add(SP);
-            output.add("M=M+1" + System.lineSeparator());
+            pushToStack();
+            incrementStackPointer();
         } else if (vmSegment.equals(LCL) || vmSegment.equals(ARG) || vmSegment.equals(THIS) || vmSegment.equals(THAT)) {
             output.add(vmSegment);
             output.add("D=M");
             output.add("@" + index);
             output.add("A=D+A");
             output.add("D=M");
-            output.add(SP);
-            output.add("A=M");
-            output.add("M=D");
-            output.add(SP);
-            output.add("M=M+1" + System.lineSeparator());
+            pushToStack();
+            incrementStackPointer();
         } else if (vmSegment.equals(STATIC)) {
             output.add("@" + fileName + "." + command.getIndex());
             output.add("D=M");
-            output.add(SP);
-            output.add("A=M");
-            output.add("M=D");
-            output.add(SP);
-            output.add("M=M+1" + System.lineSeparator());
+            pushToStack();
+            incrementStackPointer();
         } else if (vmSegment.equals(TEMP)) {
             output.add(TEMP_BASE_ADDRESS);
             output.add("D=A");
             output.add("@" + index);
             output.add("A=D+A");
             output.add("D=M");
-            output.add(SP);
-            output.add("A=M");
-            output.add("M=D");
-            output.add(SP);
-            output.add("M=M+1" + System.lineSeparator());
+            pushToStack();
+            incrementStackPointer();
         }  else if (vmSegment.equals(POINTER)) {
             if (index == POINT_TO_THIS) {
                 output.add(THIS);
                 output.add("D=M");
-                output.add(SP);
-                output.add("A=M");
-                output.add("M=D");
-                output.add(SP);
-                output.add("M=M+1" + System.lineSeparator());
+                pushToStack();
+                incrementStackPointer();
             } else {
                 //point to that
                 output.add(THAT);
                 output.add("D=M");
-                output.add(SP);
-                output.add("A=M");
-                output.add("M=D");
-                output.add(SP);
-                output.add("M=M+1" + System.lineSeparator());
+                pushToStack();
+                incrementStackPointer();
             }
         }
+    }
+
+    private void pushToStack() {
+        output.add(SP);
+        output.add("A=M");
+        output.add("M=D");
     }
 
     public void writePop(Command command) {
